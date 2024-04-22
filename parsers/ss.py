@@ -18,7 +18,7 @@ def parse(data):
             remark = urllib.parse.unquote(param[param.find('#') + 1:])
             node['tag'] = remark
         param = param[:param.find('#')]
-    if param.find('?remarks=') > -1:
+    elif param.find('?remarks=') > -1:
         if param[param.find('?remarks=') + 9:] != '':
             remark = urllib.parse.unquote(param[param.find('?remarks=') + 9:])
             node['tag'] = remark
@@ -37,7 +37,7 @@ def parse(data):
             'obfs-host={};'.format(plugin_dict["obfs-host"]) if plugin_dict.get("obfs-host") else ''
         )
         node['plugin_opts'] = result_str
-    if param.find('v2ray-plugin') > -1:
+    elif param.find('v2ray-plugin') > -1:
         if param.find('&', param.find('v2ray-plugin')) > -1:
             try:
                 plugin = tool.b64Decode(param[param.find('v2ray-plugin')+13:param.find('&', param.find('v2ray-plugin'))]).decode('utf-8')
@@ -54,7 +54,8 @@ def parse(data):
                 plugin = str({key: value for key, value in pairs})
         param = param[:param.find('?')]
         node['plugin'] = 'v2ray-plugin'
-        plugin = eval(plugin.replace('true','1'))
+        plugin = plugin.replace('true', '1').replace('false', '0')
+        plugin = eval(plugin)
         result_str = "mode={};{}{}{}{}{}{}{}".format(
             plugin.get("mode", ''),
             'host={};'.format(plugin["host"]) if plugin.get("host") else '',
@@ -68,7 +69,7 @@ def parse(data):
         node['plugin_opts'] = result_str
     if data[5:].find('protocol') > -1:
         smux = data[5:][data[5:].find('protocol'):]
-        smux_dict = parse_qs(smux)
+        smux_dict = parse_qs(smux.split('#')[0])
         smux_dict = {k: v[0] for k, v in smux_dict.items() if v[0]}
         node['multiplex'] = {
             'enabled': True,
@@ -81,7 +82,11 @@ def parse(data):
             node['multiplex']['min_streams'] = int(smux_dict['min-streams'])
         if smux_dict.get('padding') == 'True':
             node['multiplex']['padding'] = True
-    param = param.split('/')[0]
+    try: #fuck
+        param = param.split('?')[0]
+        matcher = tool.b64Decode(param) #保留'/'测试能不能解码
+    except:
+        param = param.split('/')[0].split('?')[0] #不能解码说明'/'不是base64内容
     if param.find('@') > -1:
         matcher = re.match(r'(.*?)@(.*):(.*)', param)
         if matcher:
@@ -91,7 +96,7 @@ def parse(data):
         else:
             return None
         try:
-          matcher = re.match(r'(.*?):(.*)', tool.urlDecode(param).decode('utf-8'))
+          matcher = re.match(r'(.*?):(.*)', tool.b64Decode(param).decode('utf-8'))
           if matcher:
               node['method'] = matcher.group(1)
               node['password'] = matcher.group(2)
@@ -105,7 +110,7 @@ def parse(data):
           else:
               return None
     else:
-        matcher = re.match(r'(.*?):(.*)@(.*):(.*)', tool.urlDecode(param).decode('utf-8'))
+        matcher = re.match(r'(.*?):(.*)@(.*):(.*)', tool.b64Decode(param).decode('utf-8'))
         if matcher:
             node['method'] = matcher.group(1)
             node['password'] = matcher.group(2)
@@ -146,6 +151,10 @@ def parse(data):
             }
         del node['server']
         del node['server_port']
+    if node['method'] == 'chacha20-poly1305':
+        node['method'] = 'chacha20-ietf-poly1305'
+    elif node['method'] == 'xchacha20-poly1305':
+        node['method'] = 'xchacha20-ietf-poly1305'
     if flag:
         return node,node_tls
     else:
