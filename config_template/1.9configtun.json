@@ -13,32 +13,36 @@
       "store_fakeip": false
     }
   },
+  "ntp": {
+    "enabled": true,
+    "server": "time1.aliyun.com",
+    "server_port": 123,
+    "interval": "30m"
+  },
   "dns": {
-	"fakeip": {
-		"enabled": true,
-		"inet4_range": "198.18.0.0/15",
-		"inet6_range": "fc00::/18"
-    },  
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18"
+    },
     "servers": [
       {
         "tag": "alidns",
-        "address": "https://223.5.5.5/dns-query",
-        "strategy": "ipv4_only",
+        "address": "tls://223.6.6.6",
         "detour": "direct"
       },
       {
         "tag": "google",
-        "address": "https://8.8.8.8/dns-query",
-        "strategy": "ipv4_only",
+        "address": "tls://8.8.8.8",
         "detour": "proxy"
       },
       {
-        "tag": "block",
-        "address": "rcode://success"
+        "tag": "fakeip",
+        "address": "fakeip"
       },
-	  {
-        "address": "fakeip",
-        "tag": "fakeip"
+      {
+        "tag": "block-dns",
+        "address": "rcode://success"
       }
     ],
     "rules": [
@@ -84,34 +88,41 @@
       },
       {
         "rule_set": "geosite-geolocation-!cn",
-        "server": "google"
+        "server": "fakeip"
       }
     ],
-	"final": "google",
-    "strategy": "",
-	"disable_cache": false,
+    "strategy": "prefer_ipv4",
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15"
+	  "inet6_range": "fc00::/18"
+      },
+    "disable_cache": false,
     "disable_expire": false
   },
   "inbounds": [
 	{
 		"type": "tun",
 	    "tag": "tun-in",
-	    "interface_name": "tun0",
+	    "interface_name": "Lobsel",
 	    "inet4_address": "172.19.0.1/30",
 	    "inet6_address": "fdfe:dcba:9876::1/126",
-	    "mtu": 9000,
 	    "gso": false,
 	    "auto_route": true,
 	    "strict_route": true,
+        "sniff_override_destination": true,
 		"stack": "system",
 		"sniff": true
 	},
-    {
-      "type": "mixed",
-      "listen": "127.0.0.1",
-      "listen_port": 17687,
-      "sniff": true,
-      "users": []
+	{
+		"type": "mixed",
+		"tag": "mixed-in",
+		"listen": "127.0.0.1",
+		"listen_port": 17687,
+		"tcp_fast_open": true,
+		"udp_fragment": true,
+		"sniff": true,
+		"set_system_proxy": true
     }
   ],
   "outbounds": [
@@ -155,6 +166,27 @@
       {
         "protocol": "dns",
         "outbound": "dns-out"
+      },
+      {
+        "port": 53,
+        "outbound": "dns-out"
+      },
+	  {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "port": 853
+          },
+          {
+            "network": "udp",
+            "port": 443
+          },
+          {
+            "protocol": "stun"
+          }
+        ],
+        "outbound": "block"
       },
       {
         "ip_is_private": true,
