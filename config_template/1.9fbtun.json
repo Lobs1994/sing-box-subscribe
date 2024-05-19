@@ -122,9 +122,9 @@
   ],
   "outbounds": [
     {
-      "tag": "proxy",
-      "type": "selector",
-      "outbounds": [
+      "tag":"proxy",
+      "type":"selector",
+      "outbounds":[
         "auto",
         "direct",
         "{all}"
