@@ -122,23 +122,22 @@
   ],
   "outbounds": [
     {
-      "tag": "proxy",
-      "type": "selector",
-	  "default": "urltest",
-      "outbounds": [
-		"direct",
-        "urltest",
+      "tag":"proxy",
+      "type":"selector",
+      "outbounds":[
+        "auto",
+        "direct",
         "{all}"
       ]
     },
     {
-      "tag":"urltest",
+      "tag":"auto",
       "type":"urltest",
       "outbounds":[
         "{all}"
       ],
       "url": "http://www.gstatic.com/generate_204",
-      "interval": "5m",
+      "interval": "10m",
       "tolerance": 50
     },
     {
