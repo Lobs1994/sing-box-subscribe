@@ -29,7 +29,7 @@
 		"type": "mixed",
 		"tag": "mixed-in",
 		"listen": "0.0.0.0",
-		"listen_port": 18866,
+		"listen_port": 17687,
 		"tcp_fast_open": true,
 		"udp_fragment": true,
 		"sniff": true
