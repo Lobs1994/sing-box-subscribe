@@ -29,7 +29,7 @@
 		"type": "mixed",
 		"tag": "mixed-in",
 		"listen": "0.0.0.0",
-		"listen_port": 17687,
+		"listen_port": 18866,
 		"tcp_fast_open": true,
 		"udp_fragment": true,
 		"sniff": true
@@ -161,7 +161,7 @@
       },
       {
         "clash_mode": "global", 
-        "outbound": "Proxy"
+        "outbound": "proxy"
       },
       {
         "rule_set": [
@@ -176,7 +176,7 @@
         "outbound": "block"
       }
     ],
-	"final": "Proxy",
+	"final": "proxy",
     "rule_set": [
       {
         "tag": "geosite-geolocation-!cn",
