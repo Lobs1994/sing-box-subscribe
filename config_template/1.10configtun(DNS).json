@@ -216,7 +216,7 @@
   },
   "outbounds": [
     {
-      "tag":"proxy",
+      "tag":"Proxy",
       "type":"selector",
       "outbounds":[
         "auto",
