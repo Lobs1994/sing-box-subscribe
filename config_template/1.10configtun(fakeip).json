@@ -1,0 +1,220 @@
+{
+  "inbounds": [
+	{
+		"type": "tun",
+	    "tag": "tun-in",
+	    "interface_name": "Lobsel",
+		"address": [
+			"172.19.0.1/30",
+			"fdfe:dcba:9876::1/126"
+		],
+		"route_address": [
+			"0.0.0.0/1",
+			"128.0.0.0/1",
+			"::/1",
+			"8000::/1"
+		],
+		"route_exclude_address": [
+			"192.168.0.0/16",
+			"fc00::/7"
+		],
+	    "gso": false,
+	    "auto_route": true,
+	    "strict_route": true,
+        "sniff_override_destination": true,
+		"stack": "system",
+		"sniff": true
+	},
+	{
+		"type": "mixed",
+		"tag": "mixed-in",
+		"listen": "0.0.0.0",
+		"listen_port": 18866,
+		"tcp_fast_open": true,
+		"udp_fragment": true,
+		"sniff": true
+    }
+  ],
+  "experimental": {
+    "clash_api": {
+      "external_controller": "127.0.0.1:9090",
+      "external_ui_download_url": "",
+      "secret": "",
+      "default_mode": "Enhanced",
+      "external_ui_download_detour": "",
+      "external_ui": "ui"
+    },
+    "cache_file": {
+      "enabled": true,
+      "store_fakeip": true
+    }
+  },
+  "ntp": {
+    "enabled": true,
+    "server": "time1.aliyun.com",
+    "server_port": 123,
+    "interval": "30m"
+  },
+  "dns": {
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18"
+    },
+    "servers": [
+      {
+        "tag": "google",
+        "address": "tls://8.8.8.8"
+      },
+      {
+        "tag": "local",
+        "address": "223.5.5.5",
+        "detour": "direct"
+      },
+      {
+        "tag": "remote",
+        "address": "fakeip"
+      }
+    ],
+    "rules": [
+      {
+        "outbound": "any",
+        "server": "local"
+      },
+	  {
+        "process_name": [
+          "ToDesk",
+		  "ToDesk_Service"
+        ],
+        "server": "local"
+      },
+      {
+        "query_type": [
+          "A",
+          "AAAA"
+        ],
+        "server": "remote"
+      }
+    ],
+    "fakeip": {
+      "enabled": true,
+      "inet4_range": "198.18.0.0/15",
+      "inet6_range": "fc00::/18"
+    },
+    "strategy": "prefer_ipv4",
+	"independent_cache": true
+  },
+  "route": {
+    "auto_detect_interface": true,
+    "rules": [
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "outbound": "dns-out"
+      },
+      {
+        "ip_is_private": true,
+        "outbound": "direct"
+      },
+      {
+        "process_name": [
+          "ToDesk",
+		  "ToDesk_Service"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "direct",
+        "outbound": "direct"    
+      },
+      {
+        "clash_mode": "global", 
+        "outbound": "proxy"
+      },
+      {
+        "rule_set": [
+          "geoip-cn",
+          "geosite-cn",
+		  "geosite-private"
+        ],
+        "outbound": "direct"
+      },
+      {
+        "rule_set": "geosite-category-ads-all",
+        "outbound": "block"
+      }
+    ],
+	"final": "proxy",
+    "rule_set": [
+      {
+        "tag": "geoip-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-private",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-category-ads-all",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "download_detour": "direct"
+      }
+    ]
+  },
+  "outbounds": [
+    {
+      "tag":"proxy",
+      "type":"selector",
+      "outbounds":[
+        "auto",
+        "direct",
+        "{all}"
+      ]
+    },
+    {
+      "tag":"auto",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "10m",
+      "tolerance": 50
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    },
+    {
+      "type": "dns",
+      "tag": "dns-out"
+    },
+    {
+      "type": "block",
+      "tag": "block"
+    }
+  ]
+}
