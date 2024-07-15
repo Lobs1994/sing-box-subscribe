@@ -137,7 +137,7 @@
       },
       {
         "clash_mode": "global", 
-        "outbound": "proxy"
+        "outbound": "Proxy"
       },
       {
         "rule_set": [
@@ -152,7 +152,7 @@
         "outbound": "block"
       }
     ],
-	"final": "proxy",
+	"final": "Proxy",
     "rule_set": [
       {
         "tag": "geoip-cn",
