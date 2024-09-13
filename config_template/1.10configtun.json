@@ -59,11 +59,11 @@
     "servers": [
       {
         "tag": "google",
-        "address": "tls://8.8.8.8"
+        "address": "https://8.8.8.8/dns-query"
       },
       {
         "tag": "local",
-        "address": "https://223.6.6.6/dns-query",
+        "address": "223.6.6.6",
         "detour": "direct"
       },
       {
@@ -84,21 +84,27 @@
         "clash_mode": "Global",
         "server": "google"
       },
-	  {
+      {
         "type": "logical",
         "mode": "or",
-		"rules": [
-		 {
-		    "rule_set": ["geosite-cn", "geosite-private"]
-	     },
-		 {
-			"domain_suffix": [".cn"]
-		 }
-	    ],
-		"server": "local"
+        "rules": [
+          {
+            "rule_set": [
+              "geosite-cn",
+              "geosite-private"
+            ]
+          },
+          {
+            "domain_suffix": [
+              ".cn"
+            ]
+          }
+        ],
+        "server": "local"
       },
 	  {
         "process_name": [
+	      "ToDesk.exe",
           "ToDesk",
 		  "ToDesk_Service"
         ],
@@ -120,7 +126,9 @@
         "client_subnet": "233.6.6.6/24"
       },
       {
-        "rule_set": ["geosite-category-ads-all"],
+        "rule_set": [
+          "geosite-category-ads-all"
+        ],
         "server": "block"
       }
     ],
@@ -130,6 +138,7 @@
   },
   "route": {
     "auto_detect_interface": true,
+	"override_android_vpn": true,
     "rules": [
       {
         "type": "logical",
@@ -150,6 +159,7 @@
       },
       {
         "process_name": [
+	      "ToDesk.exe",
           "ToDesk",
 		  "ToDesk_Service"
         ],
