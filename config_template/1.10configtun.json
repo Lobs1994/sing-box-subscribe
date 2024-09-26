@@ -73,6 +73,10 @@
     ],
     "rules": [
       {
+	"inbound": ["mixed-in", "tun-in"],
+        "server": "local"
+      },
+      {
         "outbound": "any",
         "server": "local"
       },
