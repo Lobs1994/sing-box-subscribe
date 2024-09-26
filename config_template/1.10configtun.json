@@ -73,7 +73,7 @@
     ],
     "rules": [
       {
-	"inbound": ["mixed-in", "tun-in"],
+	    "inbound": ["mixed-in", "tun-in"],
         "server": "local"
       },
       {
