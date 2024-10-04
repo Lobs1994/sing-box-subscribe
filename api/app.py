@@ -1,10 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, send_file, jsonify, Response
-from urllib.parse import quote, urlparse, parse_qs, unquote
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
+from urllib.parse import quote, urlparse, unquote
 import json
 import os
 import sys
 import subprocess
-import argparse  # 添加 argparse 模块
 import tempfile
 import shutil
 import tempfile  # 导入 tempfile 模块
@@ -344,4 +343,4 @@ def download_config():
         return str(e)  # 或者适当处理异常，例如返回一个错误页面
 """
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')

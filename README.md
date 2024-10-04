@@ -19,10 +19,17 @@ https://xxxxxxx.vercel.app/config/https://xxxxxxsubscribe?token=123456&file=2
 python main.py
 ```
 
-或者你可以直接带template_index参数选定模板，0表示第一个模板
+或者你可以直接带template_index参数选定模板，0表示第一个模板(no flask不支持此参数)
 
 ```
 python main.py --template_index=0
+```
+
+支持Docker
+
+```
+docker build --tag 'sing-box' .
+docker run -p 5000:5000 sing-box:latest
 ```
 
 ### 根据已有的qx，surge，loon，clash规则列表自定义规则集[https://github.com/Toperlock/sing-box-geosite](https://github.com/Toperlock/sing-box-geosite)
