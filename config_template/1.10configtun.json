@@ -159,7 +159,6 @@
   },
   "route": {
     "auto_detect_interface": true,
-    "final": "Proxy",
     "rules": [
       {
         "type": "logical",
@@ -235,6 +234,7 @@
         "outbound": "block"
       }
     ],
+    "final": "proxy",
     "rule_set": [
       {
         "tag": "geoip-google",
