@@ -378,9 +378,6 @@
       "outbounds":[
         "{all}"
       ],
-      "filter":[
-        {"action":"exclude","keywords":["🇭🇰|HK|hk|香港|香|🇹🇼|TW|tw|台湾|台|🇸🇬|SG|sg|新加坡|狮|🇯🇵|JP|jp|日本|日|🇺🇸|US|us|美国|美"]}
-      ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
       "idle_timeout": "1h0m0s"
