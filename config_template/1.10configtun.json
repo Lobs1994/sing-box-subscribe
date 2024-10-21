@@ -25,13 +25,17 @@
 		"stack": "system",
 		"sniff": true
 	},
-	{
-		"type": "mixed",
-		"tag": "mixed-in",
-		"listen": "0.0.0.0",
-		"listen_port": 17687,
-		"tcp_fast_open": true,
-		"udp_fragment": true
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "0.0.0.0",
+      "listen_port": 17687,
+      "sniff": true,
+      "sniff_override_destination": false,
+      "tcp_fast_open": false,
+	  "tcp_multi_path": false,
+      "udp_fragment": false,
+	  "domain_strategy": "ipv4_only"
     }
   ],
   "experimental": {
@@ -79,7 +83,7 @@
     ],
     "rules": [
       {
-	    "inbound": ["mixed-in", "tun-in"],
+        "outbound": "any",
         "server": "local"
       },
 	  {
@@ -88,10 +92,6 @@
           "ToDesk",
 		  "ToDesk_Service"
         ],
-        "server": "local"
-      },
-      {
-        "outbound": "any",
         "server": "local"
       },
 	  {
@@ -305,7 +305,8 @@
         "🇸🇬",
         "🇯🇵",
         "🇺🇸"
-      ]
+      ],
+	  "interrupt_exist_connections": true
     },
     {
       "tag":"🇭🇰",
@@ -318,7 +319,8 @@
       ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
-      "idle_timeout": "1h0m0s"
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
     },
     {
       "tag":"🇹🇼",
@@ -331,7 +333,8 @@
       ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
-      "idle_timeout": "1h0m0s"
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
     },
     {
       "tag":"🇸🇬",
@@ -344,7 +347,8 @@
       ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
-      "idle_timeout": "1h0m0s"
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
     },
     {
       "tag":"🇯🇵",
@@ -357,7 +361,8 @@
       ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
-      "idle_timeout": "1h0m0s"
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
     },
     {
       "tag":"🇺🇸",
@@ -370,7 +375,8 @@
       ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
-      "idle_timeout": "1h0m0s"
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
     },
     {
       "tag":"auto",
@@ -378,9 +384,13 @@
       "outbounds":[
         "{all}"
       ],
+      "filter":[
+        {"action":"exclude","keywords":["🇭🇰|HK|hk|香港|香|🇹🇼|TW|tw|台湾|台|🇸🇬|SG|sg|新加坡|狮|🇯🇵|JP|jp|日本|日|🇺🇸|US|us|美国|美"]}
+      ],
       "url": "http://www.gstatic.com/generate_204",
       "interval": "5m0s",
-      "idle_timeout": "1h0m0s"
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
     },
     {
       "type": "direct",
