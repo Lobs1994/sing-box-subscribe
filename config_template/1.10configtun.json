@@ -21,7 +21,8 @@
 	    "gso": false,
 	    "auto_route": true,
 	    "strict_route": true,
-        "sniff_override_destination": true,
+        "sniff_override_destination": false,
+	    "domain_strategy": "ipv4_only",
 		"stack": "system",
 		"sniff": true
 	},
@@ -45,35 +46,27 @@
       "secret": "",
       "external_ui_download_url": "",
       "external_ui_download_detour": "direct",
-      "default_mode": "rule"
+      "default_mode": ""
     },
-  "cache_file": {
-    "enabled": true,
-    "store_fakeip": false
+    "cache_file": {
+      "enabled": true,
+      "store_fakeip": false
     }
-  },
-  "ntp": {
-    "enabled": true,
-    "server": "ntp.aliyun.com",
-    "server_port": 123,
-    "interval": "30m",
-    "inet4_bind_address": "0.0.0.0",
-    "inet6_bind_address": "::",
-	"detour": "direct"
   },
   "dns": {
     "servers": [
       {
         "tag": "google",
-        "address": "tls://8.8.8.8",
-		"address_strategy": "ipv4_only",
-		"strategy": "ipv4_only",
-		"detour": "proxy"
+        "address": "https://dns.google/dns-query",
+		"address_resolver": "local",
+        "address_strategy": "ipv4_only",
+        "strategy": "ipv4_only",
+        "client_subnet": "223.6.6.6/24"
       },
       {
         "tag": "local",
         "address": "https://223.6.6.6/dns-query",
-		"strategy": "ipv4_only",
+        "strategy": "ipv4_only",
         "detour": "direct"
       },
       {
@@ -94,32 +87,6 @@
         ],
         "server": "local"
       },
-	  {
-        "domain_keyword": [
-          "oculus",
-		  "oculuscdn",
-		  "oculusrift",
-		  "oculusvr",
-		  "powersunitedvr",
-		  "meta",
-		  "facebook",
-		  "facebook-hardware",
-		  "fbcdn",
-		  "gstatic",
-		  "generate_204",
-		  "fb",
-		  "google-analytics",
-		  "googleapis"
-        ],
-		"server": "google"
-	  },
-      {
-        "rule_set": [
-          "geosite-google",
-		  "geosite-facebook"
-        ],
-        "server": "google"
-      },
       {
         "clash_mode": "Direct",
         "server": "local"
@@ -127,7 +94,7 @@
       {
         "clash_mode": "Global",
         "server": "google"
-      },	
+      },
       {
         "type": "logical",
         "mode": "or",
@@ -155,10 +122,10 @@
     ],
 	"final": "google",
     "disable_cache": false,
+	"independent_cache": false,
     "disable_expire": false
   },
   "route": {
-    "auto_detect_interface": true,
     "rules": [
       {
         "type": "logical",
@@ -173,38 +140,6 @@
         ],
         "outbound": "dns-out"
       },
-	  {
-        "domain_keyword": [
-          "oculus",
-		  "oculuscdn",
-		  "oculusrift",
-		  "oculusvr",
-		  "powersunitedvr",
-		  "meta",
-		  "facebook",
-		  "facebook-hardware",
-		  "fbcdn",
-		  "gstatic",
-		  "generate_204",
-		  "fb",
-		  "google-analytics",
-		  "googleapis"
-        ],
-		"outbound": "proxy"
-	  },
-      {
-        "rule_set": [
-          "geoip-google",
-          "geosite-google",
-		  "geoip-facebook",
-		  "geosite-facebook"
-        ],
-        "outbound": "proxy"
-      },
-      {
-        "ip_is_private": true,
-        "outbound": "direct"
-      },
       {
         "process_name": [
 	      "ToDesk.exe",
@@ -214,18 +149,22 @@
         "outbound": "direct"
       },
       {
-        "clash_mode": "direct",
-        "outbound": "direct"    
+        "ip_is_private": true,
+        "outbound": "direct"
       },
       {
-        "clash_mode": "global", 
+        "clash_mode": "direct",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "global",
         "outbound": "proxy"
       },
       {
         "rule_set": [
           "geoip-cn",
           "geosite-cn",
-		  "geosite-private"
+          "geosite-private"
         ],
         "outbound": "direct"
       },
@@ -234,36 +173,9 @@
         "outbound": "block"
       }
     ],
+	"auto_detect_interface": true,
     "final": "proxy",
     "rule_set": [
-      {
-        "tag": "geoip-google",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/google.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "geosite-google",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/google.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "geoip-facebook",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/facebook.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "geosite-facebook",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://mirror.ghproxy.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/facebook.srs",
-        "download_detour": "direct"
-      },
       {
         "tag": "geoip-cn",
         "type": "remote",
