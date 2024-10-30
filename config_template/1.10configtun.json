@@ -8,22 +8,13 @@
 			"172.19.0.1/30",
 			"fdfe:dcba:9876::1/126"
 		],
-		"route_address": [
-			"0.0.0.0/1",
-			"128.0.0.0/1",
-			"::/1",
-			"8000::/1"
-		],
-		"route_exclude_address": [
-			"192.168.0.0/16",
-			"fc00::/7"
-		],
-	    "gso": false,
+        "mtu": 9000,
 	    "auto_route": true,
-	    "strict_route": true,
+	    "strict_route": false,
         "sniff_override_destination": false,
 	    "domain_strategy": "ipv4_only",
-		"stack": "system",
+        "endpoint_independent_nat": false,
+		"stack": "mixed",
 		"sniff": true
 	},
     {
@@ -57,16 +48,14 @@
     "servers": [
       {
         "tag": "google",
-        "address": "https://dns.google/dns-query",
-		"address_resolver": "local",
+        "address": "https://8.8.8.8/dns-query",
+//		"address_resolver": "local",
         "address_strategy": "ipv4_only",
-        "strategy": "ipv4_only",
-        "client_subnet": "223.6.6.6/24"
+        "client_subnet": "114.114.114.114/24"
       },
       {
         "tag": "local",
-        "address": "https://223.6.6.6/dns-query",
-        "strategy": "ipv4_only",
+        "address": "223.6.6.6",
         "detour": "direct"
       },
       {
@@ -74,12 +63,13 @@
         "address": "rcode://refused"
       }
     ],
+	"strategy": "ipv4_only",
     "rules": [
       {
         "outbound": "any",
         "server": "local"
       },
-	  {
+      {
         "process_name": [
 	      "ToDesk.exe",
           "ToDesk",
@@ -96,28 +86,23 @@
         "server": "google"
       },
       {
-        "type": "logical",
-        "mode": "or",
-        "rules": [
-          {
-            "rule_set": [
-              "geosite-cn",
-              "geosite-private"
-            ]
-          },
-          {
-            "domain_suffix": [
-              ".cn"
-            ]
-          }
-        ],
+        "rule_set": "geosite-cn",
         "server": "local"
       },
       {
-        "rule_set": [
-          "geosite-category-ads-all"
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geosite-geolocation-!cn",
+            "invert": true
+          },
+          {
+            "rule_set": "geoip-cn"
+          }
         ],
-        "server": "block"
+        "server": "google",
+        "client_subnet": "114.114.114.114/24"
       }
     ],
 	"final": "google",
@@ -153,55 +138,43 @@
         "outbound": "direct"
       },
       {
-        "clash_mode": "direct",
+        "clash_mode": "Direct",
         "outbound": "direct"
       },
       {
-        "clash_mode": "global",
+        "clash_mode": "Global",
         "outbound": "proxy"
       },
       {
         "rule_set": [
           "geoip-cn",
-          "geosite-cn",
-          "geosite-private"
+          "geosite-cn"
         ],
         "outbound": "direct"
-      },
-      {
-        "rule_set": "geosite-category-ads-all",
-        "outbound": "block"
       }
     ],
 	"auto_detect_interface": true,
     "final": "proxy",
     "rule_set": [
       {
-        "tag": "geoip-cn",
+        "tag": "geosite-geolocation-!cn",
         "type": "remote",
         "format": "binary",
-        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geoip/cn.srs",
+        "url": "https://proxy.v2gh.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs",
         "download_detour": "direct"
       },
       {
-        "tag": "geosite-private",
+        "tag": "geoip-cn",
         "type": "remote",
         "format": "binary",
-        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/private.srs",
+        "url": "https://proxy.v2gh.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs",
         "download_detour": "direct"
       },
       {
         "tag": "geosite-cn",
         "type": "remote",
         "format": "binary",
-        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/cn.srs",
-        "download_detour": "direct"
-      },
-      {
-        "tag": "geosite-category-ads-all",
-        "type": "remote",
-        "format": "binary",
-        "url": "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@sing/geo/geosite/category-ads-all.srs",
+        "url": "https://proxy.v2gh.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/cn.srs",
         "download_detour": "direct"
       }
     ]
