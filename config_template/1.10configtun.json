@@ -49,7 +49,6 @@
       {
         "tag": "google",
         "address": "https://8.8.8.8/dns-query",
-//		"address_resolver": "local",
         "address_strategy": "ipv4_only",
         "client_subnet": "114.114.114.114/24"
       },
