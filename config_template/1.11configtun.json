@@ -1,0 +1,285 @@
+{
+  "inbounds": [
+	{
+	  "type": "tun",
+	  "tag": "tun-in",
+	  "interface_name": "Lobsel",
+      "address": [
+	    "172.19.0.1/30",
+		"fdfe:dcba:9876::1/126"
+	  ],
+      "mtu": 9000,
+	  "auto_route": true,
+	  "strict_route": false,
+	  "stack": "mixed"
+	},
+    {
+      "type": "mixed",
+      "tag": "mixed-in",
+      "listen": "0.0.0.0",
+      "listen_port": 17687,
+      "tcp_fast_open": false,
+	  "tcp_multi_path": false,
+      "udp_fragment": false
+    }
+  ],
+  "experimental": {
+    "clash_api": {
+      "external_controller": "127.0.0.1:9090",
+      "external_ui": "ui",
+      "secret": "",
+      "external_ui_download_url": "",
+      "external_ui_download_detour": "direct",
+      "default_mode": ""
+    },
+    "cache_file": {
+      "enabled": true,
+      "store_fakeip": false
+    }
+  },
+  "dns": {
+    "servers": [
+      {
+        "tag": "google",
+        "address": "https://8.8.8.8/dns-query",
+        "address_strategy": "ipv4_only",
+        "client_subnet": "114.114.114.114/24"
+      },
+      {
+        "tag": "local",
+        "address": "223.6.6.6",
+        "detour": "direct"
+      },
+      {
+        "tag": "dns_block",
+        "address": "rcode://refused"
+      }
+    ],
+	"strategy": "ipv4_only",
+    "rules": [
+      {
+        "outbound": "any",
+		"action": "route",
+        "server": "local"
+      },
+      {
+        "clash_mode": "Direct",
+		"action": "route",
+        "server": "local"
+      },
+      {
+        "clash_mode": "Global",
+		"action": "route",
+        "server": "google"
+      },
+      {
+        "rule_set": "geosite-cn",
+		"action": "route",
+        "server": "local"
+      },
+      {
+        "type": "logical",
+        "mode": "and",
+        "rules": [
+          {
+            "rule_set": "geosite-geolocation-!cn",
+            "invert": true
+          },
+          {
+            "rule_set": "geoip-cn"
+          }
+        ],
+		"action": "route",
+        "server": "google"
+      }
+    ],
+	"final": "google",
+	"reverse_mapping": true,
+    "disable_cache": false,
+	"independent_cache": false,
+    "disable_expire": false
+  },
+  "route": {
+    "rules": [
+      {
+        "inbound": [
+          "mixed-in",
+		  "tun-in"
+        ],
+        "action": "sniff",
+        "sniffer": [
+          "dns",
+          "bittorrent",
+          "http",
+          "tls",
+          "quic",
+          "dtls"
+        ]
+      },
+      {
+        "type": "logical",
+        "mode": "or",
+        "rules": [
+          {
+            "protocol": "dns"
+          },
+          {
+            "port": 53
+          }
+        ],
+        "action": "hijack-dns"
+      },
+      {
+        "ip_is_private": true,
+		"action": "route",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Direct",
+		"action": "route",
+        "outbound": "direct"
+      },
+      {
+        "clash_mode": "Global",
+		"action": "route",
+        "outbound": "proxy"
+      },
+      {
+        "rule_set": [
+          "geoip-cn",
+          "geosite-cn"
+        ],
+		"action": "route",
+        "outbound": "direct"
+      }
+    ],
+	"auto_detect_interface": true,
+    "final": "proxy",
+    "rule_set": [
+      {
+        "tag": "geosite-geolocation-!cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://proxy.v2gh.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/geolocation-!cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geoip-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://proxy.v2gh.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geoip/cn.srs",
+        "download_detour": "direct"
+      },
+      {
+        "tag": "geosite-cn",
+        "type": "remote",
+        "format": "binary",
+        "url": "https://proxy.v2gh.com/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/sing/geo/geosite/cn.srs",
+        "download_detour": "direct"
+      }
+    ]
+  },
+  "outbounds": [
+    {
+      "tag":"proxy",
+      "type":"selector",
+      "outbounds":[
+        "auto",
+        "🇭🇰",
+        "🇹🇼",
+        "🇸🇬",
+        "🇯🇵",
+        "🇺🇸"
+      ],
+	  "interrupt_exist_connections": true
+    },
+    {
+      "tag":"🇭🇰",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"include","keywords":["🇭🇰|HK|hk|香港|港|HongKong"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "5m0s",
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
+    },
+    {
+      "tag":"🇹🇼",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"include","keywords":["🇹🇼|TW|tw|台湾|臺灣|台|Taiwan"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "5m0s",
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
+    },
+    {
+      "tag":"🇸🇬",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"include","keywords":["🇸🇬|SG|sg|新加坡|狮|Singapore"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "5m0s",
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
+    },
+    {
+      "tag":"🇯🇵",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"include","keywords":["🇯🇵|JP|jp|日本|日|Japan"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "5m0s",
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
+    },
+    {
+      "tag":"🇺🇸",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"include","keywords":["🇺🇸|US|us|美国|美|United States"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "5m0s",
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
+    },
+    {
+      "tag":"auto",
+      "type":"urltest",
+      "outbounds":[
+        "{all}"
+      ],
+      "filter":[
+        {"action":"exclude","keywords":["🇭🇰|HK|hk|香港|香|🇹🇼|TW|tw|台湾|台|🇸🇬|SG|sg|新加坡|狮|🇯🇵|JP|jp|日本|日|🇺🇸|US|us|美国|美"]}
+      ],
+      "url": "http://www.gstatic.com/generate_204",
+      "interval": "5m0s",
+      "idle_timeout": "1h0m0s",
+	  "interrupt_exist_connections": true
+    },
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
+  ]
+}
